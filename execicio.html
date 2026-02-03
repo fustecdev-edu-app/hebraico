@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprenda Hebraico Bíblico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f4f8;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        .tab {
+            display: none;
+        }
+        .tab.active {
+            display: block;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e2e8f0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .tab-btn.active {
+            background-color: #2b6cb0;
+            color: white;
+        }
+        .hebrew-char {
+            font-size: 40px;
+            text-align: center;
+            margin: 20px 0;
+            direction: rtl;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .option-btn {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+        .option-btn:hover {
+            background-color: #f7fafc;
+        }
+        .feedback {
+            text-align: center;
+            font-size: 16px;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .correct {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .wrong {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .next-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #2b6cb0;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .next-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .progress {
+            text-align: center;
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 Aprenda Hebraico Bíblico</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('letras')">Letras (22)</button>
+            <button class="tab-btn" onclick="openTab('sequencias')">Sequências</button>
+            <button class="tab-btn" onclick="openTab('palavras')">Palavras</button>
+            <button class="tab-btn" onclick="openTab('minhas-palavras')">Minhas Palavras</button>
+        </div>
+
+        <!-- Tab 1: Reconhecimento de Letras -->
+        <div id="letras" class="tab active">
+            <div id="letra-content">
+                <div class="progress" id="letra-progress">Progresso: 1/22</div>
+                <h3>Qual é essa letra?</h3>
+                <div class="hebrew-char" id="char-display"></div>
+                <div class="options" id="letra-options"></div>
+                <div class="feedback" id="letra-feedback"></div>
+                <button class="next-btn" onclick="nextChar()" id="letra-next-btn" disabled>Próxima Letra</button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Leitura de Sequências -->
+        <div id="sequencias" class="tab">
+            <div id="sequencia-content">
+                <div class="progress" id="seq-progress">Progresso: 1/5</div>
+                <h3>Leia da DIREITA para ESQUERDA: qual é a sequência?</h3>
+                <div class="hebrew-char" id="seq-display"></div>
+                <div class="options" id="seq-options"></div>
+                <div class="feedback" id="seq-feedback"></div>
+                <button class="next-btn" onclick="nextSeq()" id="seq-next-btn" disabled>Próxima Sequência</button>
+            </div>
+        </div>
+
+        <!-- Tab 3: Formação de Palavras -->
+        <div id="palavras" class="tab">
+            <div id="palavra-content">
+                <div class="progress" id="palavra-progress">Progresso: 1/5</div>
+                <h3>Qual é o significado dessa palavra?</h3>
+                <div class="hebrew-char" id="palavra-display"></div>
+                <div class="options" id="palavra-options"></div>
+                <div class="feedback" id="palavra-feedback"></div>
+                <button class="next-btn" onclick="nextPalavra()" id="palavra-next-btn" disabled>Próxima Palavra</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: Minhas Palavras -->
+        <div id="minhas-palavras" class="tab">
+            <div id="minhas-palavras-content">
+                <h3>📝 Adicione e Estude Suas Palavras</h3>
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px;">Palavra em Hebreu:</label>
+                    <input type="text" id="input-hebraico" placeholder="Ex: ישו" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; direction: rtl;">
+                </div>
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px;">Pronúncia:</label>
+                    <input type="text" id="input-pronuncia" placeholder="Ex: Yeshua" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                </div>
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px;">Significado/Contexto:</label>
+                    <textarea id="input-significado" placeholder="Ex: Nome que significa 'O Senhor Salva'; referência a Mateus 1:21" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; min-height: 60px;"></textarea>
+                </div>
+                <button class="next-btn" onclick="adicionarPalavra()" style="margin-bottom: 20px;">Adicionar Palavra</button>
+
+                <h4>📚 Suas Palavras Cadastradas:</h4>
+                <div id="lista-minhas-palavras" style="margin-top: 10px; gap: 15px; display: flex; flex-direction: column;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DADOS COMPLETOS - TODAS AS 22 LETRAS HEBRAICAS
+        const letras = [
+            { char: "א", nome: "Aleph", som: "Silente/a", correta: "Aleph (Silente/a)" },
+            { char: "ב", nome: "Bet", som: "b/v", correta: "Bet (b/v)" },
+            { char: "ג", nome: "Gimel", som: "g", correta: "Gimel (g)" },
+            { char: "ד", nome: "Dalet", som: "d", correta: "Dalet (d)" },
+            { char: "ה", nome: "He", som: "h", correta: "He (h)" },
+            { char: "ו", nome: "Vav", som: "v/u", correta: "Vav (v/u)" },
+            { char: "ז", nome: "Zayin", som: "z", correta: "Zayin (z)" },
+            { char: "ח", nome: "Het", som: "h forte", correta: "Het (h forte)" },
+            { char: "ט", nome: "Tet", som: "t forte", correta: "Tet (t forte)" },
+            { char: "י", nome: "Yod", som: "i/j", correta: "Yod (i/j)" },
+            { char: "כ/ך", nome: "Kaf", som: "k/ch", correta: "Kaf (k/ch)" },
+            { char: "ל", nome: "Lamed", som: "l", correta: "Lamed (l)" },
+            { char: "מ/ם", nome: "Mem", som: "m", correta: "Mem (m)" },
+            { char: "נ/ן", nome: "Nun", som: "n", correta: "Nun (n)" },
+            { char: "ס", nome: "Samekh", som: "s", correta: "Samekh (s)" },
+            { char: "ע", nome: "Ayin", som: "Silente/gh", correta: "Ayin (Silente/gh)" },
+            { char: "פ/ף", nome: "Pe", som: "p/f", correta: "Pe (p/f)" },
+            { char: "צ/ץ", nome: "Tsadi", som: "ts", correta: "Tsadi (ts)" },
+            { char: "ק", nome: "Qof", som: "q", correta: "Qof (q)" },
+            { char: "ר", nome: "Resh", som: "r", correta: "Resh (r)" },
+            { char: "שׁ/שׂ", nome: "Shin/Sin", som: "sh/s", correta: "Shin/Sin (sh/s)" },
+            { char: "ת", nome: "Tav", som: "t", correta: "Tav (t)" }
+        ];
+
+        // Sequências expandidas
+        const sequencias = [
+            { seq: "גב", correta: "Gimel → Bet", opcoes: ["Bet → Gimel", "Gimel → Bet", "Aleph → Dalet"] },
+            { seq: "אד", correta: "Aleph → Dalet", opcoes: ["Dalet → Aleph", "Gimel → Bet", "Aleph → Dalet"] },
+            { seq: "דגב", correta: "Dalet → Gimel → Bet", opcoes: ["Bet → Gimel → Dalet", "Dalet → Gimel → Bet", "Aleph → Bet → Gimel"] },
+            { seq: "הגה", correta: "He → Gimel → He", opcoes: ["He → Gimel → He", "Gimel → He → He", "Vav → Dalet → Aleph"] },
+            { seq: "ידבג", correta: "Yod → Dalet → Bet → Gimel", opcoes: ["Gimel → Bet → Dalet → Yod", "Yod → Dalet → Bet → Gimel", "He → Vav → Zayin → Het"] },
+            { seq: "אב", correta: "Aleph → Bet", opcoes: ["Bet → Aleph", "Gimel → Bet", "Aleph → Bet"] },
+            
+        ];
+
+        // Palavras expandidas
+        const palavras = [
+            { palavra: "גבר", pronuncia: "Gever", significado: "Homem/Guerreiro", correta: "Homem/Guerreiro" },
+            { palavra: "דבב", pronuncia: "Dvav", significado: "Sussurro/Conversa", correta: "Sussurro/Conversa" },
+            { palavra: "אגב", pronuncia: "Agav", significado: "Além disso/Por causa de", correta: "Além disso/Por causa de" },
+            { palavra: "אמת", pronuncia: "Emet", significado: "Verdade", correta: "Verdade" },
+            { palavra: "אהבה", pronuncia: "Ahavá", significado: "Amor", correta: "Amor" }
+        ];
+
+        // Variáveis de controle
+        let currentChar = 0;
+        let currentSeq = 0;
+        let currentPalavra = 0;
+
+        // Função para trocar abas
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName("tab");
+            const btns = document.getElementsByClassName("tab-btn");
+            
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+                btns[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add("active");
+            }
+        }
+
+        // --------------------------
+        // EXERCÍCIO DE LETRAS
+        // --------------------------
+        loadChar();
+        function loadChar() {
+            document.getElementById("letra-progress").textContent = `Progresso: ${currentChar + 1}/${letras.length}`;
+            const letra = letras[currentChar];
+            document.getElementById("char-display").textContent = letra.char;
+            const optionsDiv = document.getElementById("letra-options");
+            optionsDiv.innerHTML = "";
+            
+            const opcoes = [letra.correta];
+            while (opcoes.length < 4) {
+                const randomLetra = letras[Math.floor(Math.random() * letras.length)];
+                if (!opcoes.includes(randomLetra.correta)) {
+                    opcoes.push(randomLetra.correta);
+                }
+            }
+            opcoes.sort(() => Math.random() - 0.5);
+            
+            opcoes.forEach(opcao => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.textContent = opcao;
+                btn.addEventListener('click', function() {
+                    checkAnswer(opcao, letra.correta, "letra-feedback", "char");
+                });
+                optionsDiv.appendChild(btn);
+            });
+            
+            document.getElementById("letra-feedback").textContent = "";
+            document.getElementById("letra-feedback").className = "feedback";
+            document.getElementById("letra-next-btn").disabled = true;
+        }
+
+        function nextChar() {
+            currentChar++;
+            if (currentChar >= letras.length) currentChar = 0;
+            loadChar();
+        }
+
+        // --------------------------
+        // EXERCÍCIO DE SEQUÊNCIAS
+        // --------------------------
+        loadSeq();
+       function loadSeq() {
+    document.getElementById("seq-progress").textContent = `Progresso: ${currentSeq + 1}/${sequencias.length}`;
+    const seq = sequencias[currentSeq];
+    document.getElementById("seq-display").textContent = seq.seq;
+    const optionsDiv = document.getElementById("seq-options");
+    optionsDiv.innerHTML = "";
+    
+    seq.opcoes.sort(() => Math.random() - 0.5);
+    
+    seq.opcoes.forEach(opcao => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opcao;
+        btn.addEventListener('click', function() {
+            checkAnswer(opcao, seq.correta, "seq-feedback", "seq");
+        }); // Fecha o addEventListener
+        optionsDiv.appendChild(btn);
+    }); // Fecha o forEach
+    
+    document.getElementById("seq-feedback").textContent = "";
+    document.getElementById("seq-feedback").className = "feedback";
+    document.getElementById("seq-next-btn").disabled = true;
+}
+
+        function nextSeq() {
+            currentSeq++;
+            if (currentSeq >= sequencias.length) currentSeq = 0;
+            loadSeq();
+        }
+
+        // --------------------------
+        // EXERCÍCIO DE PALAVRAS
+        // --------------------------
+        loadPalavra();
+        function loadPalavra() {
+            document.getElementById("palavra-progress").textContent = `Progresso: ${currentPalavra + 1}/${palavras.length}`;
+            const palavra = palavras[currentPalavra];
+            document.getElementById("palavra-display").textContent = palavra.palavra + " (" + palavra.pronuncia + ")";
+            const optionsDiv = document.getElementById("palavra-options");
+            optionsDiv.innerHTML = "";
+            
+            const opcoes = [palavra.correta];
+            while (opcoes.length < 3) {
+                const randomPalavra = palavras[Math.floor(Math.random() * palavras.length)];
+                if (!opcoes.includes(randomPalavra.correta)) {
+                    opcoes.push(randomPalavra.correta);
+                }
+            }
+            opcoes.sort(() => Math.random() - 0.5);
+            
+            opcoes.forEach(opcao => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.textContent = opcao;
+                btn.addEventListener('click', function() {
+                    checkAnswer(opcao, palavra.correta, "palavra-feedback", "palavra");
+                });
+                optionsDiv.appendChild(btn);
+            });
+            
+            document.getElementById("palavra-feedback").textContent = "";
+            document.getElementById("palavra-feedback").className = "feedback";
+            document.getElementById("palavra-next-btn").disabled = true;
+        }
+
+        function nextPalavra() {
+            currentPalavra++;
+            if (currentPalavra >= palavras.length) currentPalavra = 0;
+            loadPalavra();
+        }
+
+        // --------------------------
+        // MINHAS PALAVRAS - PARA ESTUDO DO TEXTO
+        // --------------------------
+        let minhasPalavras = [];
+
+        // Carregar palavras salvas
+        if (localStorage.getItem('palavrasHebreus')) {
+            minhasPalavras = JSON.parse(localStorage.getItem('palavrasHebreus'));
+            atualizarListaPalavras();
+        }
+
+        function adicionarPalavra() {
+            const hebraico = document.getElementById('input-hebraico').value.trim();
+            const pronuncia = document.getElementById('input-pronuncia').value.trim();
+            const significado = document.getElementById('input-significado').value.trim();
+
+            if (hebraico && significado) {
+                minhasPalavras.push({
+                    hebraico: hebraico,
+                    pronuncia: pronuncia,
+                    significado: significado
+                });
+                
+                localStorage.setItem('palavrasHebreus', JSON.stringify(minhasPalavras));
+                
+                document.getElementById('input-hebraico').value = '';
+                document.getElementById('input-pronuncia').value = '';
+                document.getElementById('input-significado').value = '';
+                
+                atualizarListaPalavras();
+            } else {
+                alert('Preencha pelo menos a palavra em hebraico e seu significado!');
+            }
+        }
+
+        function atualizarListaPalavras() {
+            const listaDiv = document.getElementById('lista-minhas-palavras');
+            listaDiv.innerHTML = '';
+
+            if (minhasPalavras.length === 0) {
+                listaDiv.innerHTML = '<p style="text-align: center; color: #4a5568;">Nenhuma palavra cadastrada ainda. Adicione a primeira agora!</p>';
+                return;
+            }
+
+            minhasPalavras.forEach((palavra, index) => {
+                const card = document.createElement('div');
+                card.style.padding = '15px';
+                card.style.border = '1px solid #e2e8f0';
+                card.style.borderRadius = '8px';
+                card.style.background = '#f7fafc';
+
+                card.innerHTML = `
+                    <div style="font-size: 28px; direction: rtl; text-align: center; margin-bottom: 8px;">${palavra.hebraico}</div>
+                    <div style="text-align: center; font-style: italic; margin-bottom: 8px;">${palavra.pronuncia || 'Pronúncia não informada'}</div>
+                    <div style="margin-bottom: 8px;"><strong>Significado/Contexto:</strong> ${palavra.significado}</div>
+                    <button onclick="removerPalavra(${index})" style="padding: 6px 12px; border: none; border-radius: 4px; background: #991b1b; color: white; cursor: pointer;">Remover</button>
+                `;
+
+                listaDiv.appendChild(card);
+            });
+        }
+
+        function removerPalavra(index) {
+            minhasPalavras.splice(index, 1);
+            localStorage.setItem('palavrasHebreus', JSON.stringify(minhasPalavras));
+            atualizarListaPalavras();
+        }
+
+        // --------------------------
+        // FUNÇÃO DE FEEDBACK COMPLETA
+        // --------------------------
+        function checkAnswer(escolha, correta, feedbackId, tipo) {
+            const feedback = document.getElementById(feedbackId);
+            const nextBtn = tipo === 'char' ? document.getElementById('letra-next-btn') : 
+                            tipo === 'seq' ? document.getElementById('seq-next-btn') : 
+                            document.getElementById('palavra-next-btn');
+
+            if (escolha === correta) {
+                feedback.textContent = "✅ Correto!";
+                feedback.className = "feedback correct";
+            } else {
+                feedback.textContent = `❌ Errado! Resposta correta: ${correta}`;
+                feedback.className = "feedback wrong";
+            }
+            nextBtn.disabled = false;
+        }
+    </script>
+</body>
+</html>

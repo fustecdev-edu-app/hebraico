@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Estudo Hebraico Pictográfico</title>
+    <style>
+      body { font-family: 'Segoe UI', Arial, sans-serif; background: #e0dcd5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+      .container { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 450px; width: 100%; }
+      h2 { text-align: center; color: #5d4037; margin-bottom: 5px; }
+      h4 { text-align: center; color: #8d6e63; margin-top: 0; font-weight: normal; }
+      input { font-size: 32px; padding: 10px; width: 100%; direction: rtl; text-align: right; box-sizing: border-box; border: 2px solid #bc9b6a; border-radius: 8px; margin-bottom: 15px; background: #fdfaf4; }
+      
+      .teclado { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 15px; }
+      .tecla { font-size: 20px; padding: 12px 5px; cursor: pointer; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; transition: 0.2s; }
+      .tecla:hover { background: #bc9b6a; color: white; }
+      
+      .acoes { display: flex; gap: 10px; margin-bottom: 20px; }
+      button.btn-principal { flex: 1; padding: 15px; font-size: 16px; cursor: pointer; background: #5d4037; color: white; border: none; border-radius: 8px; font-weight: bold; }
+      button.btn-limpar { background: #8d6e63; }
+      
+      .resultado { background: #fdf6e3; padding: 15px; border-radius: 8px; border-left: 5px solid #bc9b6a; min-height: 50px; }
+      .destaque-palavra { background: #d4af37; color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 18px; line-height: 1.4; }
+      .item-letra { border-bottom: 1px solid #eee; padding: 8px 0; font-size: 15px; color: #333; }
+      .item-letra strong { color: #5d4037; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Hebraico Bíblico</h2>
+  <h4>Mensagem do Eterno em Desenhos</h4>
+
+  <br><br>
+
+  <input id="hebraico" placeholder="----" readonly />
+
+  <div class="teclado">
+    <!-- Teclado seguindo sua ordem original -->
+    <button class="tecla" onclick="add('ק')">ק</button>
+    <button class="tecla" onclick="add('ר')">ר</button>
+    <button class="tecla" onclick="add('א')">א</button>
+    <button class="tecla" onclick="add('ט')">ט</button>
+    <button class="tecla" onclick="add('ו')">ו</button>
+    <button class="tecla" onclick="add('ן')">ן</button>
+    <button class="tecla" onclick="add('ם')">ם</button>
+    <button class="tecla" onclick="add('פ')">פ</button>
+    <button class="tecla" onclick="add('ש')">ש</button>
+    <button class="tecla" onclick="add('ד')">ד</button>
+    <button class="tecla" onclick="add('ג')">ג</button>
+    <button class="tecla" onclick="add('כ')">כ</button>
+    <button class="tecla" onclick="add('ע')">ע</button>
+    <button class="tecla" onclick="add('י')">י</button>
+    <button class="tecla" onclick="add('ח')">ח</button>
+    <button class="tecla" onclick="add('ל')">ל</button>
+    <button class="tecla" onclick="add('ך')">ך</button>
+    <button class="tecla" onclick="add('ף')">ף</button>
+    <button class="tecla" onclick="add('ז')">ז</button>
+    <button class="tecla" onclick="add('ס')">ס</button>
+    <button class="tecla" onclick="add('ב')">ב</button>
+    <button class="tecla" onclick="add('נ')">נ</button>
+    <button class="tecla" onclick="add('מ')">מ</button>
+    <button class="tecla" onclick="add('צ')">צ</button>
+    <button class="tecla" onclick="add('ת')">ת</button>
+    <button class="tecla" onclick="add('ץ')">ץ</button>
+    <button class="tecla" onclick="add('ה')">ה</button>
+    <button class="tecla" onclick="backspace()">⌫</button>
+  </div>
+
+  <div class="acoes">
+    <button class="btn-principal" onclick="converter()">Interpretar Mensagem</button>
+    <button class="btn-principal btn-limpar" onclick="limpar()">Limpar</button>
+    <br>
+    
+  </div>
+
+  <div class="resultado" id="resultado">Clique nas letras para analisar a raiz...</div>
+</div>
+<a href="execicio.html">exercício Alfabeto</a>
+
+<!-- busca biblia em hebraico site; https://adilsoncardoso.com/biblia-hebraica-grego-e-arc/    -->
+
+<script>
+  // Banco de Dados de Letras (Pictogramas)
+  const pictografico = {
+    'א': '<b>Aleph</b>: Boi (Força, Líder, Deus)',
+    'ב': '<b>Bet</b>: Casa (Família, Dentro, Interior)',
+    'ג': '<b>Gimel</b>: Camelo (Caminhar, Carregar, Recompensar)',
+    'ד': '<b>Dalet</b>: Porta (Acesso, Entrada, Caminho)',
+    'ה': '<b>He</b>: Braços Erguidos (Revelação, Sopro, Janela)',
+    'ו': '<b>Vav</b>: Prego/Estaca (Conectar, Unir, Estabelecer)',
+    'ז': '<b>Zayin</b>: Espada/Ferramenta (Cortar, Alimento, Lutar)',
+    'ח': '<b>Chet</b>: Cerca (Proteção, Separar, Santuário)',
+    'ט': '<b>Tet</b>: Cesto (Envolver, Guardar, Ventre)',
+    'י': '<b>Yod</b>: Mão/Braço (Trabalho, Poder, Esforço)',
+    'כ': '<b>Kaf</b>: Palma da mão (Cobrir, Permitir, Moldar)',
+    'ך': '<b>Kaf Final</b>: (Mesmo que Kaf)',
+    'ל': '<b>Lamed</b>: Cajado (Ensinar, Autoridade, Guia)',
+    'מ': '<b>Mem</b>: Água (Caos, Vida, Sangue, Multidões)',
+    'ם': '<b>Mem Final</b>: (Mesmo que Mem)',
+    'נ': '<b>Nun</b>: Semente/Peixe (Vida, Herdeiro, Continuidade)',
+    'ן': '<b>Nun Final</b>: (Mesmo que Nun)',
+    'ס': '<b>Samekh</b>: Apoio/Escudo (Sustentar, Proteger, Agarrar)',
+    'ע': '<b>Ayin</b>: Olho (Ver, Perceber, Conhecer)',
+    'פ': '<b>Pe</b>: Boca (Falar, Soprar, Abrir)',
+    'ף': '<b>Pe Final</b>: (Mesmo que Pe)',
+    'צ': '<b>Tsadi</b>: Anzol (Justiça, Alvo, Desejo)',
+    'ץ': '<b>Tsadi Final</b>: (Mesmo que Tsadi)',
+    'ק': '<b>Qof</b>: Nuca/Sol no horizonte (Ciclo, Tempo, Santo)',
+    'ר': '<b>Resh</b>: Cabeça (Homem principal, Início)',
+    'ש': '<b>Shin</b>: Dentes (Consumir, Fogo, Pressionar)',
+    'ת': '<b>Tav</b>: Sinal/Cruz (Aliança, Marca, Selo)'
+  };
+
+  // Banco de Dados de Palavras (Mensagem do Eterno)
+  const dicionarioPalavras = {
+    'אב': '<b>PAI (Ab)</b>: A força (א) que sustenta a casa (ב).',
+    'אמ': '<b>MÃE (Em)</b>: A força (א) que une como cola ou líquido (מ).',
+    'בן': '<b>FILHO (Ben)</b>: A continuidade/semente (נ) da casa (ב).',
+    'אל': '<b>DEUS (El)</b>: A força (א) com autoridade/cajado (ל).',
+    'לב': '<b>CORAÇÃO (Lev)</b>: O guia/instrução (ל) que está no interior/casa (ב).',
+    'יד': '<b>MÃO (Yad)</b>: O trabalho/mão (י) que abre a porta/caminho (ד).',
+    'אמת': '<b>VERDADE (Emet)</b>: A força (א) da vida (מ) que é o selo da aliança (ת).',
+    'אור': '<b>LUZ (Or)</b>: A força (א) que conecta (ו) ao entendimento/cabeça (ר).',
+    'יהוה': '<b>O ETERNO (YHWH)</b>: Olhe (ה) para a mão (י), olhe (ה) para o prego (ו).',
+    // Nomes de Salvação
+    'ישוע': '<b>YESHUA (Jesus/Salvação)</b>: A mão (י) do fogo (ש) que estabelece conexão (ו) com o olho/experiência (ע). O braço de Deus que purifica e abre nossos olhos para a realidade espiritual.',
+    'אברהמ': '<b>ABRAÃO</b>: Pai (אב) elevado que recebeu o sopro/revelação (ה) de Deus no meio do nome.',
+    'שלומ': '<b>SHALOM</b>: Destruir (ש) a autoridade (ל) que estabelece (ו) o caos (מ). (Vencer o caos).',
+    // Palavras da Seção ALEPH (Salmos 119:1-8)
+    'אשרי': '<b>BEM-AVENTURADO (Ashrei)</b>: A força (א) que consome o mal (ש), traz entendimento (ר) e poder (י).',
+    'ארח': '<b>CAMINHO (Orach)</b>: A força do líder (א) que guia a cabeça (ר) através da proteção/cerca (ח).',
+    'אמונה': '<b>FIDELIDADE (Emunah)</b>: A força (א) da vida/águas (מ) que continua como semente (נ) na revelação (ה).',
+    'אדות': '<b>TESTEMUNHOS (Edot)</b>: A força (א) que abre a porta (ד) para a conexão (ו) com o sinal da aliança (ת).',
+    'אז': '<b>ENTÃO (Az)</b>: A força (א) que corta/decide (ז). Indica o momento de uma decisão firme.',
+    'אחלי': '<b>TOMARA QUE (Achalai)</b>: A força (א) que busca proteção (ח) sob a autoridade (ל) da mão de Deus (י).',
+    'אשמרה': '<b>GUARDARIE (Ashmerah)</b>: A força (א) que consome o mal (ש), protege a vida (מ) e a cabeça (ר) na revelação (ה).',
+    'אלפס': '<b>NUNCA (Al-pas)</b>: A força (א) da autoridade (ל) que abre a boca (פ) para sustentar/apoiar (ס).',
+    'במה': '<b>COMO? (Bâmê)</b>: Entrando na casa (ב) para encontrar a vida (מ) e a revelação (ה).',
+    'בינה': '<b>ENTENDIMENTO (Binah)</b>: Dentro da casa (ב), o poder (י) planta a semente (נ) da revelação (ה).',
+    'ברוך': '<b>BENDITO (Baruch)</b>: Dentro da casa (ב), o líder (ר) se une (ו) à palma da mão que abençoa (ך).',
+    'בא': '<b>BUSCAR (Bâ)</b>: Entrar na casa (ב) para encontrar a Força/Deus (א).',
+    'בלבי': '<b>NO CORAÇÃO (Be-libi)</b>: Dentro da casa (ב), o guia (ל) está no interior (ב) agindo (י).',
+    // Palavras da Seção GIMEL (Salmos 119:17-24)
+    'גמל': '<b>RECOMPENSA (Gemol)</b>: O camelo/provisão (ג) que a vida (מ) traz através da autoridade/guia (ל).',
+    'גל': '<b>REVELAR/ABRIR (Gal)</b>: O camelo que traz carga (ג) sob a autoridade/cajado (ל). Abrir o que está coberto.',
+    'גר': '<b>ESTRANGEIRO (Ger)</b>: O camelo/viajante (ג) que segue o homem principal/líder (ר).',
+    'גור': '<b>HABITAR/TEMER (Gur)</b>: O viajante (ג) que se conecta (ו) ao líder/cabeça (ר).',
+    'גאות': '<b>ORGULHO (Geut)</b>: O camelo (ג) que se levanta com força (א) e conexão (ו) mas termina no sinal/julgamento (ת).',
+    'גערת': '<b>REPREENDER (Gaart)</b>: O camelo (ג) que vê/percebe (ע) a cabeça (ר) e recebe o sinal/marca (ת).',
+    'גם': '<b>TAMBÉM (Gam)</b>: O camelo (ג) que carrega a água/multidões (מ). Ajuntamento de coisas.',
+    // Palavras da Seção DALET (Salmos 119:25-32)
+    'דבקה': '<b>APEGADA (Davqah)</b>: A porta (ד) da casa (ב) que o ciclo (ק) revela (ה). Estar colado à verdade.',
+    'דרכי': '<b>MEUS CAMINHOS (Derachai)</b>: A porta (ד) do líder (ר) protegida pela cerca (ח) e pela mão/ação (י).',
+    'דלפה': '<b>CHORAR/DERRETER (Dalphah)</b>: A porta (ד) sob autoridade (ל) que abre a boca (פ) em revelação (ה). A alma que se derrama.',
+    'דרך': '<b>CAMINHO (Derech)</b>: A porta (ד) que o líder (ר) abre com a palma da mão/benção (ך).',
+    'דבק': '<b>ADERIR (Dabaq)</b>: A porta (ד) da casa (ב) que completa o ciclo (ק). Estar unido a algo.',
+    'דבר': '<b>PALAVRA (Davar)</b>: A porta (ד) da casa (ב) do líder/cabeça (ר). A palavra é a entrada para o pensamento de Deus.',
+    'דחיתי': '<b>ESCOLHI (Dachiti)</b>: A porta (ד) protegida (ח) pela aliança (ת) com o poder da mão (י).',
+    // Palavras da Seção HE (Salmos 119:33-40)
+    'הורני': '<b>ENSINA-ME (Horeni)</b>: A revelação (ה) que conecta (ו) a cabeça (ר) à semente/vida (נ) pela mão/poder (י).',
+    'הבינני': '<b>DÁ-ME ENTENDIMENTO (Havineni)</b>: A revelação (ה) dentro da casa (ב) que age (י) na semente (נ) em nova semente (נ) e poder (י).',
+    'הדריכני': '<b>GUIA-ME (Hadrichini)</b>: A revelação (ה) na porta (ד) do líder (ר) agindo (י) na palma da mão (כ) da vida (נ) e poder (י).',
+    'הט': '<b>INCLINA (Hat)</b>: A revelação (ה) que envolve e guarda (ט) o coração.',
+    'העבר': '<b>DESVIA (Haaver)</b>: A revelação (ה) que faz ver (ע) a casa (ב) do líder (ר). Pedido para tirar os olhos da vaidade.',
+    'הקם': '<b>CONFIRMA (Haquem)</b>: A revelação (ה) no ciclo/tempo (ק) das águas/multidões (מ). Tornar algo firme.',
+    'הנחני': '<b>DIRIGE-ME (Hanchini)</b>: A revelação (ה) da semente/vida (נ) protegida (ח) na continuidade (נ) e poder (י).',
+    // Palavras da Seção VAV (Salmos 119:41-48)
+    'ויבאני': '<b>E VENHAM SOBRE MIM (Viyvoani)</b>: A conexão (ו) que traz o poder (י) para dentro da casa (ב) da força (א) e da vida (נ) agindo (י).',
+    'ואענה': '<b>E RESPONDEREI (Veeaneh)</b>: A conexão (ו) da força (א) que faz ver (ע) a semente (נ) na revelação (ה).',
+    'ואשמרה': '<b>E GUARDAREI (Veeshmerah)</b>: A conexão (ו) da força (א) que consome o mal (ש), protege a vida (מ) e o líder (ר) na revelação (ה).',
+    'ואתהלכה': '<b>E ANDAREI (Veethalchah)</b>: A conexão (ו) da força (א) no sinal da aliança (ת) com revelação (ה) sob autoridade (ל) na palma da mão (כ) e revelação (ה).',
+    'ואדברה': '<b>E FALAREI (Vaadabrah)</b>: A conexão (ו) da força (א) na porta (ד) da casa (ב) do líder (ר) com revelação (ה).',
+    'ואשתעשע': '<b>E ME ALEGRAREI (Veeshtaashah)</b>: A conexão (ו) da força (א) que consome (ש) o sinal (ת) e faz ver (ע) o que consome (ש) e faz ver (ע). (Prazer intenso).',
+    'ואשא': '<b>E LEVANTAREI (Veesa)</b>: A conexão (ו) da força (א) que consome (ש) com poder/força (א). Erguer as mãos.',
+    // Palavras da Seção ZAYIN (Salmos 119:49-56)
+    'זכר': '<b>LEMBRA-TE / MEMÓRIA (Zechor)</b>: A espada/ferramenta (ז) que corta/marca a palma da mão (כ) do líder (ר). Gravar algo para não esquecer.',
+    'זאת': '<b>ISTO / ESTA (Zot)</b>: A espada/ferramenta (ז) com a força (א) do sinal da aliança (ת). Refere-se à Lei como algo concreto.',
+    'זמירות': '<b>CÂNTICOS (Zemirot)</b>: A ferramenta/corte (ז) da água/multidões (מ) agindo (י) na cabeça (ר) conectada (ו) ao sinal (ת). Ritmo que corta o tempo.',
+    'זעף': '<b>INDIGNAÇÃO (Zaaph)</b>: A espada (ז) que faz ver/perceber (ע) o sopro/boca (ף). O calor da ira ou vento forte.',
+    'זכרתי': '<b>LEMBREI-ME (Zacharti)</b>: A marca/ferramenta (ז) na palma da mão (כ) do líder (ר) selada na aliança (ת) pelo poder/ação (י).',
+    'זקנים': '<b>ANCIÃOS (Zequenim)</b>: A espada/ferramenta (ז) no ciclo do tempo (ק) da semente (נ) agindo (י) nas águas/multidões (מ).',
+    'זנחתני': '<b>DESAMPARAR (Zenachtani)</b>: A ferramenta (ז) que afasta a semente (נ) da proteção/cerca (ח) no sinal (ת) agindo (י).',
+    // Palavras da Seção CHET (Salmos 119:57-64)
+    'חלקי': '<b>MINHA PORÇÃO (Chelqui)</b>: A cerca/proteção (ח) sob autoridade (ל) no ciclo/tempo (ק) da minha mão/poder (י).',
+    'חליתי': '<b>SUPLICREI (Chiliti)</b>: A cerca/proteção (ח) sob autoridade (ל) agindo (י) no sinal da aliança (ת) com poder (י).',
+    'חשבתי': '<b>CONSIDEREI (Chashavti)</b>: A cerca (ח) que consome o mal (ש) na casa (ב) do sinal (ת) agindo (י). Meditar nos caminhos.',
+    'חשתי': '<b>APRESSEI-ME (Chashti)</b>: A cerca (ח) que consome (ש) o sinal (ת) agindo (י). Agir com urgência espiritual.',
+    'חבלי': '<b>CORDAS/LAÇOS (Chevlei)</b>: A cerca (ח) da casa (ב) sob autoridade (ל) agindo (י). O que prende ou une.',
+    'חצות': '<b>MEIA-NOITE (Chatzot)</b>: A cerca (ח) do anzol/justiça (צ) conectada (ו) ao sinal (ת). O meio da escuridão.',
+    'חבר': '<b>COMPANHEIRO (Chaver)</b>: A cerca/proteção (ח) da casa (ב) do líder (ר). Aquele que divide a mesma proteção.',
+    // Palavras da Seção TET (Salmos 119:65-72)
+    'טוב': '<b>BOM / BONDADE (Tov)</b>: O cesto/o que envolve (ט) a conexão (ו) com a casa/interior (ב). O que é completo e benéfico por dentro.',
+    'טובת': '<b>FIZESTE BEM (Tovat)</b>: O cesto/bondade (ט) que conecta (ו) a casa (ב) ao sinal da aliança (ת).',
+    'טעם': '<b>JUÍZO / GOSTO (Taam)</b>: O que envolve (ט) a visão/olho (ע) das águas/multidões (מ). A percepção correta das coisas.',
+    'טפל': '<b>FORJARAM / MENTIRA (Taphal)</b>: O que envolve (ט) a boca (פ) sob autoridade/cajado (ל). Cobrir a verdade com palavras falsas.',
+    'טהר': '<b>PURO (Tahar)</b>: O que envolve (ט) a revelação (ה) da cabeça/líder (ר). Limpeza que vem de dentro.',
+    'טובתי': '<b>FOI-ME BOM (Tovti)</b>: A bondade envolvente (ט) que conecta (ו) a casa (ב) ao sinal (ת) agindo (י).',
+    'טפלו': '<b>UNTERAM (Taphalu)</b>: O que envolve (ט) a boca (פ) sob autoridade (ל) conectada (ו). Usado para "untar" ou "forjar" mentiras.',
+    // Palavras da Seção YOD (Salmos 119:73-80)
+    'ידיך': '<b>TUAS MÃOS (Yadecha)</b>: A mão/poder (י) que abre a porta (ד) da mão/concessão (י) na palma da mão (ך). As mãos que formam.',
+    'יעשוני': '<b>ME FIZERAM (Yaasuni)</b>: A mão (י) que vê/percebe (ע) e consome/trabalha (ש) a conexão (ו) da semente/vida (נ) agindo (י).',
+    'ידעתי': '<b>EU SEI / CONHEÇO (Yadati)</b>: A mão/poder (י) que abre a porta (ד) do olho/visão (ע) no sinal (ת) agindo (י). Conhecer por experiência.',
+    'ישר': '<b>RETO / JUSTO (Yashar)</b>: A mão/poder (י) que consome o mal (ש) da cabeça/líder (ר). Alinhamento perfeito.',
+    'ינחמי': '<b>CONSOLE-ME (Yenachameni)</b>: A mão (י) da vida/semente (נ) que protege (ח) as águas/multidões (מ) agindo (י).',
+    'יבאוני': '<b>VENHAM A MIM (Yevouni)</b>: A mão/ação (י) que entra na casa (ב) da força (א) conectada (ו) à vida (נ) agindo (י).',
+    'יבושו': '<b>SEJAM CONFUNDIDOS (Yevoshu)</b>: A mão/poder (י) na casa (ב) conectada (ו) ao que consome/fogo (ש) conectado (ו).',
+    // Palavras da Seção KAF (Salmos 119:81-88)
+    'כלתה': '<b>DESFALECE / CONSUMIDA (Caletah)</b>: A palma da mão (כ) sob autoridade (ל) no sinal (ת) com revelação (ה). Esgotar-se completamente.',
+    'כלוני': '<b>CONSUMIRAM-ME (Caluni)</b>: A palma da mão (כ) sob autoridade (ל) conectada (ו) à semente/vida (נ) agindo (י).',
+    'כדא': '<b>COMO ODRE (Cenod)</b>: A palma da mão/cobertura (כ) na porta (ד) da força (א). Refere-se ao odre de couro na fumaça.',
+    'כמה': '<b>QUANDO? / QUANTO? (Camah)</b>: A palma da mão (כ) nas águas/multidões (מ) com revelação (ה). Medir o tempo ou a dor.',
+    'כרו': '<b>ABRIRAM / CAVARAM (Caru)</b>: A palma da mão/trabalho (כ) do líder (ר) conectada (ו). Cavar uma cova ou um poço.',
+    'כל': '<b>TUDO / TODOS (Col)</b>: A palma da mão (כ) que contém sob sua autoridade (ל). A totalidade de algo.',
+    'כחסדך': '<b>SEGUNDO A TUA BENÇÃO (Cechesdecha)</b>: Como (כ) a proteção (ח) do apoio (ס) da porta (ד) na palma da mão (ך).',
+    // Palavras da Seção LAMED (Salmos 119:89-96)
+    'לעולם': '<b>PARA SEMPRE (Leolam)</b>: Sob a autoridade (ל) do olho/visão (ע) que se conecta (ו) à autoridade (ל) das águas/multidões (מ). O tempo que foge à visão.',
+    'לדר': '<b>PARA GERAÇÕES (Ledor)</b>: Sob a autoridade (ל) da porta (ד) do líder/cabeça (ר). A continuidade da linhagem.',
+    'למשפטיך': '<b>PARA TEUS JUÍZOS (Lemishpatecha)</b>: Sob autoridade (ל) das águas (מ) que consomem (ש) a boca (פ) envolta (ט) na mão (י) e palma (ך).',
+    'לולי': '<b>SE NÃO FORA (Lulei)</b>: A autoridade (ל) conectada (ו) à autoridade (ל) da mão (י). Uma condição de dependência total.',
+    'לעולם': '<b>ETERNO (Leolam)</b>: Sob a autoridade (ל) que vê (ע) a conexão (ו) do guia (ל) nas águas do tempo (ם).',
+    'לכל': '<b>A TUDO / PARA TODOS (Lechol)</b>: Sob a autoridade (ל) da palma da mão (כ) que governa a autoridade (ל). A abrangência total.',
+    'למדני': '<b>ENSINA-ME (Lamedni)</b>: O cajado/instrução (ל) das águas/vida (מ) que abre a porta (ד) da semente (נ) e do poder (י).',
+    // Palavras da Seção MEM (Salmos 119:97-104)
+    'מה': '<b>QUÃO! / O QUE! (Mah)</b>: As águas/fluxo (מ) da revelação (ה). Uma expressão de admiração profunda.',
+    'מכל': '<b>MAIS QUE TODOS (Micol)</b>: As águas/origem (מ) da palma da mão (כ) sob autoridade (ל). Comparação de superioridade.',
+    'מלמדי': '<b>MEUS MESTRES (Melamdai)</b>: As águas/fluxo (מ) da autoridade (ל) das águas (מ) da porta (ד) agindo (י). Aqueles que fluem ensino.',
+    'מצותיך': '<b>TEUS MANDAMENTOS (Mitzvotecha)</b>: As águas (מ) do anzol/justiça (צ) conectadas (ו) ao sinal (ת) agindo (י) na palma da mão (ך).',
+    'מה': '<b>QUÃO! / O QUE!, DOCE (Mah)</b>: As águas (מ) da revelação (ה). Refere-se a algo que flui suavemente ao paladar.',
+    'מפי': '<b>DA MINHA BOCA (Mipi)</b>: As águas/origem (מ) da boca (פ) agindo (י). O que flui do interior.',
+    'מכל': '<b>DE TODO (Micol)</b>: O fluxo (מ) da palma da mão (כ) sob autoridade (ל). Abrangência total de uma ação.',
+    // Palavras da Seção NUN (Salmos 119:105-112)
+    'נר': '<b>LÂMPADA (Ner)</b>: A semente/vida (נ) do líder/cabeça (ר). A luz que permite à vida caminhar.',
+    'נתיבה': '<b>VEREDA / CAMINHO (Netivah)</b>: A semente (נ) no sinal da aliança (ת) agindo (י) dentro da casa (ב) com revelação (ה).',
+    'נדבות': '<b>OFERTAS VOLUNTÁRIAS (Nidvot)</b>: A semente (נ) na porta (ד) da casa (ב) conectada (ו) ao sinal/aliança (ת).',
+    'נפשי': '<b>MINHA ALMA (Napshi)</b>: A semente/vida (נ) da boca/sopro (פ) que consome/fogo (ש) agindo (י). O ser vivente.',
+    'נחלו': '<b>HERANÇA (Nachalu)</b>: A semente (נ) protegida pela cerca (ח) sob autoridade (ל) conectada (ו).',
+    'נשבעתי': '<b>JUREI (Nishbati)</b>: A semente (נ) que consome (ש) dentro da casa (ב) no sinal (ת) agindo (י). Um compromisso vital.',
+    'נטיתי': '<b>INCLINEI (Netiti)</b>: A semente (נ) que envolve/guarda (ט) agindo (י) no sinal (ת) agindo (י).',
+    // Palavras da Seção SAMEKH (Salmos 119:113-120)
+    'סעפים': '<b>PENSAMENTOS VÃOS (Seaphim)</b>: O apoio/escudo (ס) que vê/percebe (ע) a boca (פ) agindo (י) nas águas (ם). Pensamentos que dividem a mente.',
+    'סתרי': '<b>MEU ESCONDERIJO (Sitri)</b>: O escudo (ס) no sinal da aliança (ת) do líder (ר) agindo (י). O lugar onde se está seguro.',
+    'סמכוני': '<b>SUSTENTA-ME (Samchuni)</b>: O apoio (ס) das águas (מ) na palma da mão (כ) conectada (ו) à vida/semente (נ) agindo (י).',
+    'סעדני': '<b>AMPARA-ME (Saadeni)</b>: O escudo/apoio (ס) que vê (ע) a porta (ד) da semente (נ) agindo (י).',
+    'סלית': '<b>DESPREZASTE (Salit)</b>: O apoio (ס) sob autoridade (ל) agindo (י) no sinal (ת). Rejeitar o que não tem base firme.',
+    'סיגים': '<b>ESCÓRIAS (Siguim)</b>: O apoio (ס) agindo (י) no caminhar (ג) agindo (י) nas águas (ם). O que sobra do refino do metal.',
+    'סמר': '<b>ESTREMECEU (Samar)</b>: O escudo/apoio (ס) das águas (מ) do líder (ר). A pele que se arrepia de temor.',
+    // Palavras da Seção AYIN (Salmos 119:121-128)
+    'עשיתי': '<b>TENHO PRATICADO (Asiti)</b>: O olho/percepção (ע) que consome o mal (ש) agindo (י) no sinal (ת) agindo (י). Agir com base no que se vê da Lei.',
+    'ערב': '<b>SÊ FIADOR (Arev)</b>: O olho (ע) do líder/cabeça (ר) dentro da casa (ב). Garantir proteção para quem está dentro.',
+    'עיני': '<b>MEUS OLHOS (Einai)</b>: O olho/visão (ע) da semente (נ) agindo (י). A percepção da vida que busca a salvação.',
+    'עבדך': '<b>TEU SERVO (Avdecha)</b>: O olho/percepção (ע) dentro da casa (ב) na porta (ד) da palma da mão (ך). Aquele que vigia a porta do mestre.',
+    'עת': '<b>TEMPO (Et)</b>: O olho (ע) no sinal da aliança (ת). O momento de perceber o cumprimento de algo.',
+    'עדותיך': '<b>TEUS TESTEMUNHOS (Edotecha)</b>: O olho/visão (ע) na porta (ד) conectada (ו) ao sinal (ת) agindo (י) na palma (ך).',
+    'על': '<b>SOBRE / ACIMA (Al)</b>: O olho (ע) sob autoridade/cajado (ל). Estar em uma posição elevada de visão.',
+    // Palavras da Seção PE (Salmos 119:129-136)
+    'פלאות': '<b>MARAVILHOSOS (Pelaot)</b>: A boca/sopro (פ) sob autoridade (ל) da força (א) conectada (ו) ao sinal (ת). O que é dito com poder divino.',
+    'פתח': '<b>ABERTURA / EXPOSIÇÃO (Petach)</b>: A boca (פ) no sinal da aliança (ת) que protege/cerca (ח). Revelar o que estava guardado.',
+    'פתי': '<b>SIMPLES (Peti)</b>: A boca (פ) no sinal da aliança (ת) agindo (י). Alguém que está aberto a ser ensinado.',
+    'פי': '<b>MINHA BOCA (Pi)</b>: A boca (פ) agindo (י). O órgão da fala e do fôlego espiritual.',
+    'פנה': '<b>VOLTA-TE (Peneh)</b>: A boca/rosto (פ) da semente/vida (נ) na revelação (ה). Pedir que a face de Deus se abra para nós.',
+    'פעמיי': '<b>MEUS PASSOS (Paamai)</b>: A boca/abertura (פ) que vê (ע) as águas (מ) agindo (י) agindo (י). O ritmo do caminhar.',
+    'פדיני': '<b>RESGATA-ME (Pedeni)</b>: A boca (פ) na porta (ד) da semente (נ) agindo (י). Falar para abrir a porta da liberdade.',
+    'פלגי': '<b>RIOS / CORRENTES (Palvei)</b>: A boca/abertura (פ) sob autoridade (ל) do caminhar (ג) agindo (י). Lágrimas que fluem como rios.',
+    // Palavras da Seção TSADI (Salmos 119:137-144)
+    'צדיק': '<b>JUSTO (Tzadic)</b>: O anzol/justiça (צ) na porta (ד) agindo (י) no ciclo do tempo (ק). Alguém que foi "pescado" pela verdade.',
+    'צדק': '<b>JUSTIÇA (Tzedec)</b>: O anzol/justiça (צ) na porta (ד) do ciclo/tempo (ק). O padrão reto de Deus.',
+    'צוית': '<b>ORDENASTE (Tzivita)</b>: O anzol/desejo (צ) conectado (ו) ao sinal da aliança (ת) agindo (י) no sinal (ת).',
+    'צמתتני': '<b>CONSUMIU-ME (Tzimatatni)</b>: O anzol (צ) das águas (מ) no sinal (ת) no sinal (ת) agindo (י). O zelo que "prende" o coração.',
+    'צרופה': '<b>MUITO PURA (Tzaruphah)</b>: A justiça (צ) do líder/cabeça (ר) conectada (ו) à boca/sopro (פ) com revelação (ה). Como metal refinado.',
+    'צעיר': '<b>PEQUENO (Tzair)</b>: O anzol/justiça (צ) que vê (ע) o poder (י) do líder (ר). Humildade diante da grandeza.',
+    'צדקתך': '<b>TUA JUSTIÇA (Tzedacatecha)</b>: O anzol (צ) na porta (ד) do ciclo (ק) no sinal (ת) agindo (י) na palma (ך).',
+    'צר': '<b>ANGÚSTIA (Tzar)</b>: O anzol (צ) do líder/cabeça (ר). Estar em um "aperto" ou lugar estreito.',
+    // Palavras da Seção QOF (Salmos 119:145-152)
+    'קראתי': '<b>CLAMEI (Quarati)</b>: No ciclo do tempo (ק), o líder (ר) tem a força (א) do sinal (ת) agindo (י). O grito que busca o Criador.',
+    'קויתי': '<b>ESPEREI (Quiviti)</b>: No ciclo do tempo (ק), conectei (ו) o sinal (ת) agindo (י). Aguardar o desenrolar do plano divino.',
+    'קדמו': '<b>ANTECIPARAM (Quidmu)</b>: O ciclo (ק) na porta (ד) das águas/tempo (מ) conectado (ו). Chegar antes do amanhecer.',
+    'קולי': '<b>MINHA VOZ (Quoli)</b>: O ciclo/eco (ק) conectado (ו) sob autoridade (ל) agindo (י). O som que alcança o trono.',
+    'קרוב': '<b>PRÓXIMO (Quarov)</b>: No ciclo do tempo (ק), o líder (ר) se conecta (ו) à casa (ב). Deus perto de quem o chama.',
+    'קדם': '<b>ANTIGAMENTE (Quedem)</b>: O ciclo/origem (ק) na porta (ד) das águas do tempo (מ). O que vem desde o princípio.',
+    'קמתי': '<b>LEVANTEI-ME (Quamti)</b>: No ciclo (ק) das águas (מ) com o sinal da aliança (ת) agindo (י). Despertar para a busca espiritual.',
+    // Palavras da Seção RESH (Salmos 119:153-160)
+    'ראה': '<b>OLHA / VÊ (Reeh)</b>: O líder/cabeça (ר) que tem a força (א) da revelação (ה). Pedir que Deus tome a frente e veja a dor.',
+    'ריבה': '<b>PLEITEIA (Rivah)</b>: O líder (ר) agindo (י) dentro da casa (ב) com revelação (ה). Defender uma causa como um advogado.',
+    'רחוק': '<b>LONGE (Rachoq)</b>: O líder (ר) protegido pela cerca (ח) conectado (ו) ao ciclo distante (ק). Aquilo que está fora de alcance.',
+    'רחמיך': '<b>TUAS MISERICÓRDIAS (Rachamecha)</b>: O líder (ר) que protege (ח) as águas da vida (מ) agindo (י) na palma da mão (ך). O útero materno do Criador.',
+    'רבים': '<b>MUITOS (Ravim)</b>: O líder (ר) dentro da casa (ב) agindo (י) nas águas/multidões (ם). Grande quantidade.',
+    'רדפוני': '<b>PERSEGUIRAM-ME (Redaphuni)</b>: O líder (ר) na porta (ד) da boca (פ) conectada (ו) à semente/vida (נ) agindo (י).',
+    'ראש': '<b>A SOMA / O PRINCÍPIO (Rosh)</b>: O líder/cabeça (ר) com a força (א) que consome o mal (ש). O topo ou a essência de algo.',
+    'רע': '<b>MAU / PRÓXIMO (Ra)</b>: O líder (ר) que vê (ע). Pode significar o mal ou um companheiro, dependendo do contexto da visão.',
+    // Palavras da Seção SHIN (Salmos 119:161-168)
+    'שרים': '<b>PRÍNCIPES (Sharim)</b>: O fogo/poder (ש) do líder (ר) agindo (י) nas multidões (ם). Aqueles que governam.',
+    'שש': '<b>REGOZIJO-ME (Shash)</b>: O fogo (ש) que consome outro fogo (ש). Uma alegria que queima e transborda.',
+    'שלל': '<b>DESPOJO (Shalal)</b>: O fogo (ש) sob autoridade (ל) sob autoridade (ל). O que é tomado após a vitória.',
+    'שקר': '<b>MENTIRA (Shequer)</b>: O fogo (ש) no ciclo do tempo (ק) do líder (ר). Algo que se consome e desaparece por não ter base.',
+    'שלום': '<b>PAZ (Shalom)</b>: O fogo (ש) sob autoridade (ל) conectado (ו) às águas/caos (ם). O fogo que consome o caos e traz ordem.',
+    'שבע': '<b>SETE VEZES (Sheva)</b>: O fogo (ש) dentro da casa (ב) que faz ver (ע). O número da plenitude e do descanso.',
+    'שברתי': '<b>ESPEREI (Shibarti)</b>: O fogo (ש) dentro da casa (ב) do líder (ר) no sinal (ת) agindo (י). Aguardar com zelo.',
+    'שמרתי': '<b>GUARDEI (Shamarti)</b>: O fogo (ש) das águas (מ) do líder (ר) no sinal (ת) agindo (י). Proteger a Palavra como um tesouro.',
+    // Palavras da Seção TAV (Salmos 119:169-176)
+    'תקרב': '<b>CHEGUE / APROXIME-SE (Ticrav)</b>: O sinal da aliança (ת) no ciclo do tempo (ק) do líder (ר) dentro da casa (ב).',
+    'תבא': '<b>VENHA (Tavo)</b>: O sinal (ת) dentro da casa (ב) da força/líder (א). Pedir que a presença de Deus entre.',
+    'תבענה': '<b>PRONUNCIARÃO / FLUIRÃO (Tivaanah)</b>: O sinal (ת) dentro da casa (ב) que vê (ע) a semente/vida (נ) na revelação (ה).',
+    'תען': '<b>RESPONDERÁ / CANTARÁ (Taan)</b>: O sinal da aliança (ת) que vê (ע) a semente/vida (נ). A resposta fiel à Palavra.',
+    'תהי': '<b>SEJA (Tehi)</b>: O sinal (ת) da revelação (ה) agindo (י). O desejo de que algo se torne real pelo poder de Deus.',
+    'תאבתני': '<b>ANELO / DESEJO (Taavtani)</b>: O sinal (ת) da força (א) dentro da casa (ב) no sinal (ת) da semente (נ) agindo (י).',
+    'תחיה': '<b>VIVA (Tichi)</b>: O sinal (ת) da proteção/cerca (ח) agindo (י) na revelação (ה). A vida protegida pela aliança.',
+    'תעיתי': '<b>EXTRAVIEI-ME (Taiti)</b>: O sinal (ת) que vê (ע) agindo (י) no sinal (ת) agindo (י). Perder-se do caminho selado.',
+    // Nomes Patriarcais
+    'יעקב': '<b>JACÓ (Ya’akov)</b>: A mão (י) que vê (ע) o ciclo/calcanhar (ק) dentro da casa (ב). Aquele que segura o calcanhar e luta pela bênção da família.',
+    // Nomes de Nações e Identidade
+    'ישראל': '<b>ISRAEL (Yisra’el)</b>: A mão (י) do fogo (ש) do líder (ר) com a força (א) da autoridade (ל). Aquele que prevalece com Deus e governa sob Sua direção.',
+    // Cidades Sagradas
+    'ירושלים': '<b>JERUSALÉM (Yerushalayim)</b>: A mão (י) do líder (ר) que conecta (ו) o dente/fogo (ש) à autoridade (ל) agindo (י) nas águas/multidões (ם). O lugar onde o ensino da paz flui como águas.',
+    // Nomes Divinos
+    'אלהים': '<b>ELOHIM (Deus Criador)</b>: A força (א) da autoridade (ל) revelada (ה) agindo (י) nas águas/multidões (ם). O Criador cujo fôlego de vida estabelece ordem sobre o caos das águas.',
+    'שמים': '<b>CÉUS (Shamáyim)</b>: O fogo (ש) das águas (מ) agindo (י) nas águas/multidões (ם). A morada divina onde o fogo e a água coexistem em perfeita harmonia.',
+    'ארץ': '<b>TERRA (Éretz)</b>: A força (א) do líder (ר) no alvo/justiça (ץ). O território que deve ser governado pela força do Criador para atingir o propósito correto.',
+    'אור': '<b>LUZ (Or)</b>: A força (א) que conecta (ו) ao líder (ר). O primeiro elemento da criação que permite ver a conexão entre o Criador e a Sua obra.',
+    'שמר': '<b>SHAMAR (Guardar/Vigiar)</b>: Agarrar/Pressionar (ש) o caos (מ) sob a direção do Líder (ר). No deserto, significava colocar uma cerca de espinhos ao redor do rebanho para protegê-lo de perigos externos. É o ato de entesourar e proteger algo precioso.',
+    'למד': '<b>LAMAD (Ensinar/Aprender)</b>: O cajado do pastor (ל) direcionando as águas/caos (מ) para a porta (ד). Representa o processo de ser guiado para fora da confusão mental em direção a uma nova entrada de conhecimento.',
+    'אשמורות': '<b>ASHMUROT (Vigílias)</b>: O plural de Ashmurah. Deriva da raiz SH-M-R (Guardar). No contexto bíblico, refere-se às divisões da noite (geralmente três) em que os guardas vigiavam. Espiritualmente, representa os momentos de silêncio e prontidão onde a alma se coloca como vigia da Palavra.',
+    'אמת': '<b>EMET (Verdade)</b>: A força (א) das águas (מ) na aliança/sinal (ת). Representa algo que é firme, fiel e que permanece do início ao fim. É a força que flui através da aliança divina.',
+    'מת': '<b>MET (Morto/Morte)</b>: As águas (מ) que chegam ao sinal/fim (ת). Representa o encerramento do fluxo da vida, onde o movimento das águas para e atinge o limite da aliança terrena.',
+    'חי': '<b>CHAY (Vida)</b>: A cerca/parede (ח) da mão (י). Representa a vida como algo que é protegido e mantido pela ação divina. É a força vital que está segura dentro de um limite estabelecido por Deus.',
+    'חיה': '<b>CHAYAH (Viver/Vivificar)</b>: A cerca (ח) da mão (י) que se revela (ה). É o ato de trazer a vida para fora, de tornar a existência visível e manifesta através do fôlego e da luz.',
+    'דם': '<b>DAM (Sangue)</b>: A porta (ד) das águas (ם). Representa o líquido vital que flui através da "porta" das veias e artérias. É a vida em estado líquido e físico.',
+    'אדם': '<b>ADAM (Homem/Adão)</b>: A força (א) no sangue (דם). É a união da centelha divina com a natureza física. O homem é o sangue (terra/físico) vivificado pela força de Deus.',
+    'שם': '<b>SHEM (Nome/Identidade)</b>: O fogo/luz (ש) sobre as águas/multidões (ם). Representa a marca distintiva ou o fôlego que define quem uma pessoa é. É a luz que brilha sobre a substância de um indivíduo, revelando sua verdadeira natureza.',
+    'תורה': '<b>TORAH (Instrução)</b>: A marca da aliança (ת) do líder (ר) que conecta (ו) à revelação (ה). É o mapa do Líder que nos aponta o caminho para não errarmos o alvo da vida.',
+    'מצוה': '<b>MITZVAH (Mandamento)</b>: As águas (מ) do anzol/justiça (צ) que conectam (ו) à revelação (ה). É o gancho que nos puxa para fora do caos e nos prende à vontade de Deus.',
+    'חק': '<b>CHOK (Decreto)</b>: A vida/cerca (ח) no horizonte/sol (ק). Representa uma lei que foi gravada como o sol que nasce todos os dias; é um limite estabelecido que sustenta a ordem do universo.',
+    'משפט': '<b>MISHPAT (Juízo)</b>: As águas (מ) consumidas/pressionadas (ש) pela boca (פ) no alvo/surpresa (ט). Representa a palavra falada (boca) que separa o que é confuso e define o caminho correto através de uma decisão.',
+    'עדות': '<b>EDOT (Testemunhos)</b>: O olho (ע) na porta (ד) que conecta (ו) ao sinal/aliança (ת). É o ato de ver e testemunhar o que foi estabelecido na entrada da aliança; é a prova visível da fidelidade divina.',
+    'ברוך': '<b>BARUCH (Bendito/Abençoado)</b>: A casa (ב) do líder (ר) que se conecta (ו) à palma da mão/curvar-se (כ). Representa o ato de ajoelhar-se ou curvar-se na presença de uma autoridade para receber um presente ou provisão.',
+    'אמן': '<b>AMEN (Amém/Firmeza)</b>: A força (א) das águas (מ) que nutre a semente/herdeiro (ן). Representa algo que é confiável, firme e que tem continuidade. É a garantia de que a Palavra de Deus frutificará.',
+    'הללו': '<b>HALELU (Louvai)</b>: Olhar/Revelar (ה) para o cajado (ל) que se move com autoridade (ל) para conectar (ו). Representa o ato de apontar com admiração para o guia e brilhar ao reconhecer sua direção.',
+    'שיחה': '<b>SICHAH (Meditação/Conversa)</b>: O fogo que consome (ש) a mão que age (י) dentro da parede/cerca (ח) para gerar revelação (ה). Representa um pensamento tão intenso que "queima" na mente e transborda em palavras.',
+    'מים': '<b>MAYIM (Águas)</b>: O fluxo (מ) que revela (י) o fluxo (ם). Representa a vida em movimento, o caos que pode ser organizado ou a fonte de purificação que nunca cessa. É o recurso essencial que sustenta toda a criação.',
+    'רוח': '<b>RUACH (Espírito/Vento/Sopro)</b>: O líder (ר) que se conecta (ו) através da parede/cerca (ח). Representa o fôlego de vida que atravessa fronteiras, o vento que sopra com direção ou a presença invisível de Deus que ativa a criação.',
+    'קדש': '<b>KODESH (Santo/Separado)</b>: O ciclo do sol no horizonte (ק) diante da porta (ד) que brilha/consome (ש). Representa algo que foi retirado do uso comum e colocado em um lugar de luz e destaque. É a separação do que é profano para o que é divino.',
+    'חטא': '<b>CHET (Pecado/Errar o Alvo)</b>: A cerca (ח) do cesto/alvo (ט) diante da força (א). Representa o ato de desviar-se do caminho estabelecido, errando o alvo que Deus (a Força) colocou para nós. É estar fora da proteção da cerca divina.',
+    'תשובה': '<b>TESHUVAH (Retorno/Arrependimento)</b>: O sinal (ת) do fogo (ש) que conecta (ו) à casa (ב) para revelar (ה). Representa o ato de voltar para o ponto de origem, retornando à casa do Pai e à marca da aliança.',
+    'חסד': '<b>CHESED (Misericórdia/Bondade)</b>: A cerca (ח) que serve de apoio (ס) na porta (ד). Representa o amor leal que protege, sustenta e oferece uma entrada segura. É a bondade ativa que mantém a aliança firme mesmo quando somos fracos.',
+    'אמונה': '<b>EMUNAH (Fé/Fidelidade)</b>: A força (א) das águas (מ) que conecta (ו) a semente (נ) para revelar (ה). Representa a firmeza e a constância que nutrem a vida até que o propósito de Deus seja revelado. É a fidelidade que permanece firme ao longo do tempo.',
+    'עולם': '<b>OLAM (Eternidade/Mundo)</b>: O olho (ע) conectado (ו) à autoridade (ל) sobre as águas/caos (ם). Representa o que está além do horizonte visível; um tempo ou espaço que se estende infinitamente sob o governo divino.',
+    'שמחה': '<b>SIMCHAH (Alegria)</b>: O fogo (ש) das águas (מ) dentro da cerca/proteção (ח) que se revela (ה). Representa o brilho interior e o transbordamento vital de quem está seguro e nutrido na presença de Deus.',
+    'דרך': '<b>DERECH (Caminho/Jornada)</b>: A porta (ד) do líder (ר) que se abre na palma da mão (ך). Representa o curso da vida ou a estrada que o Líder estabeleceu para trilharmos com nossas próprias mãos e pés.',
+    'עני': '<b>ONI (Aflição/Humildade)</b>: O olho (ע) na semente (נ) da mão (י). Representa a experiência de ser diminuído ou "dobrado", forçando o indivíduo a olhar para a sua essência (semente) e buscar a mão de Deus.',
+    'נחמה': '<b>NECHAMAH (Consolo)</b>: A semente (נ) dentro da cerca (ח) das águas (מ) que se revela (ה). Representa o ato de respirar fundo e encontrar descanso; é a vida que estava apertada e agora encontra um fluxo de paz.',
+    'אויב': '<b>OIEV (Inimigo)</b>: A força (א) conectada (ו) à mão (י) contra a casa (ב). Representa aquele que usa sua energia e ações para tentar invadir ou destruir o lugar de segurança e a identidade do outro.',
+    'עזר': '<b>EZER (Socorro/Ajuda)</b>: O olho (ע) na ferramenta/arma (ז) do líder (ר). Representa a vigilância atenta que utiliza os recursos necessários para proteger e guiar. É o auxílio que vem de quem vê o perigo antes de você.',
+    'מגן': '<b>MAGEN (Escudo)</b>: O fluxo/águas (מ) que o camelo/transportador (ג) atravessa para proteger a semente (ן). Representa a proteção móvel que envolve a vida (semente) e a transporta em segurança através das águas do caos ou do ataque inimigo.',
+    'תקוה': '<b>TIQVAH (Esperança/Corda)</b>: O sinal (ת) do horizonte (ק) que conecta (ו) à revelação (ה). Representa a corda que nos une ao futuro de Deus; uma expectativa firme que nos puxa para fora da dificuldade em direção à luz.',
+    'זכר': '<b>ZACHAR (Lembrar/Memória) também usada para Macho</b>: A ferramenta/arma (ז) do líder (ר) que corta/marca a palma da mão (כ). Representa o ato de gravar algo para que não se perca; é trazer o passado para o presente para que ele dite a ação atual.',
+    'פחד': '<b>PACHAD (Temor/Pavor)</b>: A boca (פ) diante da parede (ח) da porta/decisão (ד). Representa o estado de ficar sem palavras ou estremecer diante de uma barreira intransponível ou de uma autoridade absoluta.',
+    'אהב': '<b>AHAV (Amor)</b>: A força (א) que revela (ה) a casa (ב). Representa a energia que sustenta a família e torna o lar um lugar de revelação. É o ato de dar-se para construir e manter o lugar de habitação do outro.',
+    'ידה': '<b>YADAH (Louvar/Confessar)</b>: A mão (י) que abre a porta (ד) para a revelação (ה). Representa o ato de estender as mãos para lançar fora o pecado ou para apontar para a glória de Deus. É a expressão externa de uma verdade interna.',
+    'עקב': '<b>EQEV (Calcanhar/Recompensa)</b>: O olho (ע) no horizonte/ciclo (ק) da casa (ב). Representa o rastro deixado pelo calcanhar ou o resultado final de uma jornada. É a consequência natural ou a recompensa que recebemos ao completar um ciclo.',
+    'תמים': '<b>TAMIM (Íntegro/Completo)</b>: O sinal (ת) das águas (מ) sob a mão (י) que encontra a paz/conclusão (ם). Representa a pessoa que é consistente do início ao fim, cuja vida não é dividida, mas sim uma obra completa sob a mão de Deus.',
+
+
+  };
+
+  function add(letra) {
+    document.getElementById('hebraico').value += letra;
+  }
+
+  function backspace() {
+    let campo = document.getElementById('hebraico');
+    campo.value = campo.value.slice(0, -1);
+  }
+
+  function limpar() {
+    document.getElementById('hebraico').value = '';
+    document.getElementById('resultado').innerHTML = 'Clique nas letras para analisar a raiz...';
+  }
+
+  function converter() {
+    const texto = document.getElementById('hebraico').value;
+    let resultadoHTML = '';
+
+    if(texto === "") return;
+
+    // 1. Verifica se a palavra inteira existe no dicionário
+    if (dicionarioPalavras[texto]) {
+        resultadoHTML += `
+            <div class="destaque-palavra">
+                ${dicionarioPalavras[texto]}
+            </div>
+            <hr style="border: 0; border-top: 1px dashed #bc9b6a; margin: 10px 0;">
+        `;
+    }
+
+    // 2. Lista o significado de cada letra
+    for (let letra of texto) {
+      let info = pictografico[letra] || "Letra desconhecida no sistema.";
+      resultadoHTML += `<div class="item-letra"><strong>${letra}</strong> &rarr; ${info}</div>`;
+    }
+
+    document.getElementById('resultado').innerHTML = resultadoHTML;
+  }
+</script>
+</body>
+</html>
