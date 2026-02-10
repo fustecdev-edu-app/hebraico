@@ -34,6 +34,8 @@
   <br><br>
 
   <input id="hebraico" placeholder="----" readonly />
+ 
+  <h2 id="resul">busca</h2>
 
   <div class="teclado">
     <!-- Teclado seguindo sua ordem original -->
@@ -76,9 +78,9 @@
 
   <div class="resultado" id="resultado">Clique nas letras para analisar a raiz...</div>
 </div>
-<a href="execicio.html">exercício Alfabeto</a>
+<a href="execicio.html"><strong>exercício Alfabeto</strong></a>
 
-<!-- busca biblia em hebraico site; https://adilsoncardoso.com/biblia-hebraica-grego-e-arc/    -->
+
 
 <script>
   // Banco de Dados de Letras (Pictogramas)
@@ -374,6 +376,7 @@
   function limpar() {
     document.getElementById('hebraico').value = '';
     document.getElementById('resultado').innerHTML = 'Clique nas letras para analisar a raiz...';
+    document.getElementById('resul').innerHTML=""
   }
 
   function converter() {
@@ -399,7 +402,61 @@
     }
 
     document.getElementById('resultado').innerHTML = resultadoHTML;
+    
+   buscarTextoInteligente();
   }
+
+// Função de busca inteligente - filtra por palavras que começam com a primeira letra digitada
+function buscarTextoInteligente() {
+    const textoDigitado = document.getElementById('hebraico').value.trim();
+    const elementoResultado = document.getElementById('resul');
+
+    // Limpa resultado se vazio
+    if (!textoDigitado) {
+        elementoResultado.innerHTML = '<p>Digite uma letra ou palavra em hebraico bíblico para buscar.</p>';
+        return;
+    }
+
+    let resultado = '';
+    const primeiraLetra = textoDigitado[0]; // Pega a primeira letra digitada
+
+    // 1. Busca por correspondência exata primeiro
+    if (dicionarioPalavras.hasOwnProperty(textoDigitado)) {
+        resultado += `<div class="resultado-exato"><strong>Correspondência exata:</strong><br>${dicionarioPalavras[textoDigitado]}</div>`;
+    }
+
+    // 2. Busca por palavras que COMEÇAM com a primeira letra digitada
+    const correspondenciasIniciais = Object.entries(dicionarioPalavras)
+        .filter(([palavra, descricao]) => {
+            // Inclui apenas se começar com a primeira letra E não for a correspondência exata
+            return palavra[0] === primeiraLetra && palavra !== textoDigitado;
+        });
+
+    if (correspondenciasIniciais.length > 0) {
+        resultado += `<div class="resultado-inicial"><strong>Palavras que começam com "${primeiraLetra}":</strong><ul>`;
+        correspondenciasIniciais.forEach(([palavra, descricao]) => {
+            resultado += `<li><strong>${palavra}</strong>: ${descricao}</li>`;
+        });
+        resultado += '</ul></div>';
+    }
+
+    // 3. Se não houver nenhum resultado
+    if (!resultado) {
+        resultado = `<p>Nenhuma palavra encontrada que comece com "${primeiraLetra}" ou corresponda a "${textoDigitado}".</p>`;
+    }
+
+    elementoResultado.innerHTML = resultado;
+}
+
+// Ativa busca ao digitar
+document.getElementById('hebraico').addEventListener('input', buscarTextoInteligente);
+
+// Função para chamar busca via botão (opcional)
+function executarBusca() {
+    buscarTextoInteligente();
+}
+
+
 </script>
 </body>
 </html>
